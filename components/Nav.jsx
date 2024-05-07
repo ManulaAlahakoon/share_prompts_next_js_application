@@ -7,6 +7,7 @@ import { signIn, signOut, useSession, getProviders } from "next-auth/react";
 
 const Nav = () => {
   const [providers, setProviders] = useState(null);
+const [toggleDropdown, setToggleDropdown] = useState(false)  
   const isUserLoggedIn = true;
 
   useEffect(() => {
@@ -50,6 +51,65 @@ const Nav = () => {
                 alt="Profile"
               />
             </Link>
+          </div>
+        ) : (
+          <div>
+            {providers &&
+              Object.values(providers).map((provider) => (
+                <button
+                  type="button"
+                  key={provider.name}
+                  onClick={() => {
+                    signIn(provider.id);
+                  }}
+                  className="black_btn"
+                >
+                  Sign in
+                </button>
+              ))}
+          </div>
+        )}
+      </div>
+      {/*Mobile navigation*/}
+      <div className="sm:hidden flex relative">
+        {isUserLoggedIn ? (
+          <div className="flex">
+            <Image
+              src="/assets/images/profile.svg"
+              width={37}
+              height={37}
+              className="rounded-full"
+              alt="Profile"
+              onClick={()=>setToggleDropdown((prev)=>!prev)}
+            />
+            {toggleDropdown && (
+              <div className="dropdown">
+                <Link
+                  href="/profile"
+                  className="dropdown_link"
+                  onClick={()=>setToggleDropdown(false)}
+                >
+                  My Profile
+                </Link>
+                <Link
+                  href="/create_prompt"
+                  className="dropdown_link"
+                  onClick={()=>setToggleDropdown(false)}
+                >
+                  Create Profile
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setToggleDropdown(false)
+                    signOut()
+                  }}
+                  className="mt-5 w-full black_btn"
+                >
+                  Sign out
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div>
