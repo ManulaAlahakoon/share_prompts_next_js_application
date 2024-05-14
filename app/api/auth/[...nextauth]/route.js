@@ -8,45 +8,48 @@ const handler = NextAuth({
     providers: [
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            callbackUrl: 'http://localhost:3000/api/auth/callback/google'
+
         })
     ],
+    callbacks: {
+        async session({ session }) {
+            const sessionUser = await User.findOne({
+                email: session.user.email
+            })
 
-    async session({ session }) {
-        const sessionUser = await User.findOne({
-            email: session.user.email
-        })
+            session.user.id = sessionUser._id.toString()
 
-        session.user.id = sessionUser._id.toString()
+            return session;
+        },
 
-        return session;
-    },
+        async signIn({ profile }) {
 
-    async signIn({ profile }) {
-
-        try {
-            await connectToDB();
+            try {
+                await connectToDB();
             
-            //Check whether user already exists
-            const userExists = await User.findOne({
-                email: profile.email
-            });
+                //Check whether user already exists
+                const userExists = await User.findOne({
+                    email: profile.email
+                });
             
-            //If not, create a new user
-            if (!userExists) {
-                await User.create({
-                    email: profile.email,
-                    username: profile.name.replace(" ", "").toLowerCase(),
-                    image: profile.picture
-                })
+                //If not, create a new user
+                if (!userExists) {
+                    await User.create({
+                        email: profile.email,
+                        username: profile.name.replace(" ", "").toLowerCase(),
+                        image: profile.picture
+                    })
+                }
+
+                return true;
+            } catch (error) {
+                console.log(error)
+                return false;
             }
-
-            return true;
-        } catch (error) {
-            console.log(error)
-            return false;
-        }
         
+        }
     }
 }) 
 
