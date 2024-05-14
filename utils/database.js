@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 let isConnected = false;
 //Not using 'const' as data type because this is bound to change
 
-export const connectDB = async () => {
+export const connectToDB = async () => {
     mongoose.set('strictQuery', true)
     if (isConnected) {
         console.log("MongoDB is already connected!")
@@ -12,8 +12,8 @@ export const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_URI, {
             dbName: "share_prompt",
-            useNewUrlParser: true,
-            useUnifiedTopology: true
+            //useNewUrlParser: true,
+            //useUnifiedTopology: true
         })
 
         isConnected = true
